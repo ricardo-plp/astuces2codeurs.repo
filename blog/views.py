@@ -8,12 +8,36 @@ from blog.models import Post
 from blog.forms import CommentForm
 from blog.models import Comment
 
+from blog.models import Category
 
-class Post_Index(generic.ListView):
-    queryset = Post.objects.all()
-    template_name = 'blog/index.html'
-    paginate_by = 1
-    context_object_name = 'posts'
+
+def post(request, category=None):
+    posts = Post.objects.all()
+    categories = Category.objects.all()
+    if category:
+        category = get_object_or_404(Category, slug=category)
+        posts = posts.filter(category=category)
+    paginator = Paginator(posts, 2)
+    page = request.GET.get('page')
+    try:
+        posts = paginator.page(page)
+    except PageNotAnInteger:
+        posts = paginator.page(1)
+    except EmptyPage:
+        posts = paginator.page(paginator.num_pages)
+    context = {
+        'posts':posts,
+        'page':page,
+        'categories':categories,
+        'category':category,
+    }
+    return render(request, 'blog/index.html',context)
+
+#class Post_Index(generic.ListView):
+#    queryset = Post.objects.all()
+#    template_name = 'blog/index.html'
+#    paginate_by = 2
+#    context_object_name = 'posts'
 
 
 def post_detail(request, slug: str):
