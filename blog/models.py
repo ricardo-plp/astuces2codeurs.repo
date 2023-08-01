@@ -4,13 +4,17 @@ from django.utils import timezone
 # Create your models here.
 from django.utils.text import slugify
 
+
+class PublishedManager(models.Manager):
+    def get_queryset(self):
+        return super(PublishedManager, self).get_queryset().filter(status='published')
+
 class Category(models.Model):
     name = models.CharField(max_length=200)
     slug = models.SlugField(max_length=200)
 
     def __str__(self):
         return self.name
-
 
 class Post(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='category')
@@ -26,6 +30,9 @@ class Post(models.Model):
     status = models.CharField(choices=STATUS_CHOICES, default='draft', max_length=10)
     publish = models.DateTimeField(default=timezone.now())
     Author = models.ForeignKey(User,on_delete=models.CASCADE, related_name='posted')
+    image = models.ImageField(upload_to="post", default="")
+    objects = models.Manager()
+    published = PublishedManager()
 
     def __str__(self):
         return self.title

@@ -1,9 +1,6 @@
 from django.urls import path
-
-
-
 from blog.views import post_detail
-#from blog.views import Post_Index
+
 
 
 from blog.views import post

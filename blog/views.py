@@ -12,11 +12,11 @@ from blog.models import Category
 
 
 def post(request, category=None):
-    posts = Post.objects.all()
+    posts = Post.published.all()
     categories = Category.objects.all()
     if category:
         category = get_object_or_404(Category, slug=category)
-        posts = posts.filter(category=category)
+        posts = posts.filter(category=category).order_by("publish")
     paginator = Paginator(posts, 2)
     page = request.GET.get('page')
     try:
